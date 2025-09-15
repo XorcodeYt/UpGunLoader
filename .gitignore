@@ -1,0 +1,26 @@
+# Visual Studio cache
+.vs/
+
+# Build results
+bin/
+obj/
+
+# User-specific files
+*.user
+*.suo
+
+# Visual Studio Code settings
+.vscode/
+
+# Build logs
+*.log
+
+# NuGet packages (si jamais tu veux pas versionner les packages restaurés)
+packages/
+*.nupkg
+
+# Autres fichiers temporaires
+[Tt]emp/
+
+# Git de merde
+.gitattributes
