@@ -1,4 +1,4 @@
-<h1 align="center">UpGun Mod Loaders 2.0 ⚡</h1>
+<h1 align="center">UpGun Mod Loader 2.0 ⚡</h1>
 <p align="center">
   <b>A modern, reworked Mod Loader for UpGun</b><br>
   <i>Cleaner • Faster • More Reliable</i>
