@@ -4,10 +4,6 @@
   <i>Cleaner • Faster • More Reliable</i>
 </p>
 
-<p align="center">
-  <img src="https://i.ibb.co/q3m3TfkT/A0-D82516-B712-4618-BCBB-2702-B29-C20-BE.png" alt="UpGun Mod Loader Screenshot" width="600">
-</p>
-
 ---
 
 ## ✨ Features & Improvements
