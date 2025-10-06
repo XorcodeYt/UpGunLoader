@@ -4,10 +4,6 @@
   <i>Cleaner • Faster • More Reliable</i>
 </p>
 
-<p align="center">
-  <img src="https://i.ibb.co/q3m3TfkT/A0-D82516-B712-4618-BCBB-2702-B29-C20-BE.png" alt="UpGun Mod Loader Screenshot" width="600">
-</p>
-
 ---
 
 ## ✨ Features & Improvements
@@ -25,7 +21,7 @@
 2. Download the **latest release**  
 3. Extract the `.zip` file  
 4. Run the installer  
-5. Once installed, you can delete the `.zip` and extracted folder  
+5. Once installed, you can delete the `.zip` and the setup  
 6. Launch the Mod Loader from the desktop shortcut  
 
 > ⚠️ Windows only  
