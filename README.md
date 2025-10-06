@@ -21,7 +21,7 @@
 2. Download the **latest release**  
 3. Extract the `.zip` file  
 4. Run the installer  
-5. Once installed, you can delete the `.zip` and extracted folder  
+5. Once installed, you can delete the `.zip` and the setup  
 6. Launch the Mod Loader from the desktop shortcut  
 
 > ⚠️ Windows only  
