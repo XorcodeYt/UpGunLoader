@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 [GeneratedCode("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.6.0.0")]
 internal sealed class Settings : ApplicationSettingsBase
 {
-	private static Settings defaultInstance = (Settings)Synchronized(new Settings());
+    private static Settings defaultInstance = (Settings)Synchronized(new Settings());
 
-	public static Settings Default => defaultInstance;
+    public static Settings Default => defaultInstance;
 }

@@ -9,97 +9,90 @@ using System.IO.Compression;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
 internal class Fonctions
 {
-	private static string version = "1.0";
+    private readonly static string version = "1.0";
 
-    private static string CurrentGameVersion = UpGunFinder.GetInstalledVersion();
+    private readonly static string CurrentGameVersion = UpGunFinder.GetInstalledVersion();
 
     public static string UpGunPath = UpGunFinder.GetUpGunPaksPath();
 
-	public static string appdatapath = "C:\\Users\\" + Environment.UserName + "\\AppData\\Roaming";
+    public static string appdatapath = "C:\\Users\\" + Environment.UserName + "\\AppData\\Roaming";
 
-	public static string appdatapath2 = appdatapath + "\\UpGunMods";
+    public static string appdatapath2 = appdatapath + "\\UpGunMods";
 
     private static readonly string GameVersionFile =
     !string.IsNullOrWhiteSpace(appdatapath2)
         ? Path.Combine(appdatapath2, "gameversion.txt")
         : Path.Combine(Environment.CurrentDirectory, "gameversion.txt");
 
-    private static string appdatapath3 = appdatapath2 + "\\Mods";
+    private readonly static string appdatapath3 = appdatapath2 + "\\Mods";
 
-	public static string appdatapath4 = appdatapath2 + "\\MyUploadedMods\\MyMods.txt";
+    private readonly static string path2 = appdatapath2 + "\\repak.exe";
 
-	public static string appdatapath5 = appdatapath2 + "\\MyUploadedMods\\Username.txt";
+    private readonly static string AESKey = ""; // AES
 
-	private static string path2 = appdatapath2 + "\\repak.exe";
+    private readonly static string ARPath = UpGunPath + "\\UpGun-WindowsNoEditor_AssetRegistry\\UpGun\\AssetRegistry.bin";
 
-	private static string AESKey = ""; // AES
+    private readonly static string ARPath2 = UpGunPath + "\\UpGun-WindowsNoEditor_AssetRegistry\\UpGun\\Content";
 
-    private static string ARPath = UpGunPath + "\\UpGun-WindowsNoEditor_AssetRegistry\\UpGun\\AssetRegistry.bin";
+    public static string PakGameFilePath = UpGunPath + "\\UpGun-WindowsNoEditor.pak";
 
-	private static string ARPath2 = UpGunPath + "\\UpGun-WindowsNoEditor_AssetRegistry\\UpGun\\Content";
-
-	public static string PakGameFilePath = UpGunPath + "\\UpGun-WindowsNoEditor.pak";
-
-	public static string PakModsSupportFilePath = UpGunPath + "\\UpGun-WindowsNoEditor_AssetRegistry.pak";
+    public static string PakModsSupportFilePath = UpGunPath + "\\UpGun-WindowsNoEditor_AssetRegistry.pak";
 
     public static async Task CheckLoaderUpdate()
     {
         string token = ""; // GITHUB TOKEN
         string url = "https://api.github.com/repos/XorcodeYt/UpGunLoader/releases";
 
-        using (HttpClient httpClient = new HttpClient())
+        using HttpClient httpClient = new();
+        httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("UpGunModLoader/1.0");
+        httpClient.DefaultRequestHeaders.Accept.Add(
+            new MediaTypeWithQualityHeaderValue("application/vnd.github+json"));
+        httpClient.DefaultRequestHeaders.Authorization =
+            new AuthenticationHeaderValue("token", token);
+
+        HttpResponseMessage response = await httpClient.GetAsync(url);
+        if (!response.IsSuccessStatusCode)
         {
-            httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("UpGunModLoader/1.0");
-            httpClient.DefaultRequestHeaders.Accept.Add(
-                new MediaTypeWithQualityHeaderValue("application/vnd.github+json"));
-            httpClient.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue("token", token);
+            MessageBox.Show(
+                "Unable to check for updates.\nPlease try again later.",
+                "Update Check Failed",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Warning);
+            return;
+        }
 
-            HttpResponseMessage response = await httpClient.GetAsync(url);
-            if (!response.IsSuccessStatusCode)
-            {
-                MessageBox.Show(
-                    "Unable to check for updates.\nPlease try again later.",
-                    "Update Check Failed",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Warning);
-                return;
-            }
+        string json = await response.Content.ReadAsStringAsync();
+        JArray releases = JArray.Parse(json);
 
-            string json = await response.Content.ReadAsStringAsync();
-            JArray releases = JArray.Parse(json);
+        if (releases.Count == 0)
+        {
+            MessageBox.Show(
+                "No releases were found on the update server.",
+                "Update Check Failed",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Warning);
+            return;
+        }
 
-            if (releases.Count == 0)
-            {
-                MessageBox.Show(
-                    "No releases were found on the update server.",
-                    "Update Check Failed",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Warning);
-                return;
-            }
+        JObject latest = (JObject)releases[0];
+        string latestName = latest["name"]?.ToString() ?? "inconnu";
+        string latestTag = latest["tag_name"]?.ToString() ?? "inconnu";
 
-            JObject latest = (JObject)releases[0];
-            string latestName = latest["name"]?.ToString() ?? "inconnu";
-            string latestTag = latest["tag_name"]?.ToString() ?? "inconnu";
-
-            if (!string.Equals(latestName.TrimStart('v', 'V'), version, StringComparison.OrdinalIgnoreCase))
-            {
-                MessageBox.Show(
-                    $"A new version is available: {latestName}\n" +
-                    $"Current version: V{version}\n\n" +
-                    "Please update your application to the latest version.",
-                    "Update Required",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Information);
-            }
+        if (!string.Equals(latestName.TrimStart('v', 'V'), version, StringComparison.OrdinalIgnoreCase))
+        {
+            MessageBox.Show(
+                $"A new version is available: {latestName}\n" +
+                $"Current version: V{version}\n\n" +
+                "Please update your application to the latest version.",
+                "Update Required",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Information);
         }
     }
 
@@ -191,7 +184,7 @@ internal class Fonctions
             SplashManager.Update("Moving .pak to UpGun folder");
             File.Delete(text + ".zip");
             File.Move(text + ".pak", UpGunPath + "\\" + Name + ".pak");
-			CreateSig(Name);
+            CreateSig(Name);
 
             if (Directory.Exists(text))
             {
@@ -206,47 +199,47 @@ internal class Fonctions
 
 
     public static void InjectJsonCode(string FolderJsonToInject)
-	{
-		try
-		{
-			AssetRegistry assetRegistry = new AssetRegistry();
-			assetRegistry.Read(File.ReadAllBytes(ARPath));
-			string[] files = Directory.GetFiles(FolderJsonToInject, "*.json");
-			for (int i = 0; i < files.Length; i++)
-			{
-				AssetRegistry.FAssetData item = JsonConvert.DeserializeObject<AssetRegistry.FAssetData>(File.ReadAllText(files[i]));
-				assetRegistry.fAssetDatas.Add(item);
-			}
-			File.WriteAllBytes(ARPath, assetRegistry.Make());
-		}
-		catch
-		{
-			MessageBox.Show("Une erreur s'est produite!");
-		}
-	}
+    {
+        try
+        {
+            AssetRegistry assetRegistry = new();
+            assetRegistry.Read(File.ReadAllBytes(ARPath));
+            string[] files = Directory.GetFiles(FolderJsonToInject, "*.json");
+            for (int i = 0; i < files.Length; i++)
+            {
+                AssetRegistry.FAssetData item = JsonConvert.DeserializeObject<AssetRegistry.FAssetData>(File.ReadAllText(files[i]));
+                assetRegistry.fAssetDatas.Add(item);
+            }
+            File.WriteAllBytes(ARPath, assetRegistry.Make());
+        }
+        catch
+        {
+            MessageBox.Show("Une erreur s'est produite!");
+        }
+    }
 
-	public static void ReinstallAllMods()
-	{
-		if (Directory.Exists(appdatapath3))
-		{
-			string[] directories = Directory.GetDirectories(appdatapath3);
-			for (int i = 0; i < directories.Length; i++)
-			{
-				InjectJsonCode(directories[i]);
-			}
-		}
-	}
+    public static void ReinstallAllMods()
+    {
+        if (Directory.Exists(appdatapath3))
+        {
+            string[] directories = Directory.GetDirectories(appdatapath3);
+            for (int i = 0; i < directories.Length; i++)
+            {
+                InjectJsonCode(directories[i]);
+            }
+        }
+    }
 
-	public static bool CheckIfModSupportInstalled()
-	{
-		if (!File.Exists(PakModsSupportFilePath))
-		{
+    public static bool CheckIfModSupportInstalled()
+    {
+        if (!File.Exists(PakModsSupportFilePath))
+        {
             SavePath();
             InstallModsSupport();
-			return false;
-		}
-		return true;
-	}
+            return false;
+        }
+        return true;
+    }
 
     public static bool CheckGameUpdates()
     {
@@ -339,24 +332,16 @@ internal class Fonctions
 
             string quotedPath2 = $"\"{path2}\"";
 
-            SplashManager.Update("Unpacking base game pak");
+            SplashManager.Update("Initialization Mod Loader");
             ExecuteCmdCommand($"{quotedPath2} --aes-key {AESKey} unpack \"{PakGameFilePath}\"");
-
-            SplashManager.Update("Moving AssetRegistry.bin");
             Directory.CreateDirectory(UpGunPath + "\\UpGun-WindowsNoEditor_AssetRegistry\\UpGun");
-			File.Move(UpGunPath + "\\UpGun-WindowsNoEditor\\UpGun\\AssetRegistry.bin", ARPath);
-
-            SplashManager.Update("Adapting game files");
+            File.Move(UpGunPath + "\\UpGun-WindowsNoEditor\\UpGun\\AssetRegistry.bin", ARPath);
             CopyDirectory(appdatapath2 + "\\Content", ARPath2, true);
-
-            SplashManager.Update("Repacking game content");
             ExecuteCmdCommand($"{quotedPath2} pack \"{UpGunPath}\\UpGun-WindowsNoEditor_AssetRegistry\"");
-			CreateSig("UpGun-WindowsNoEditor_AssetRegistry");
-
-            SplashManager.Update("Cleaning & backup");
+            SplashManager.Update("Cleaning and Backup");
             Directory.Delete(UpGunPath + "\\UpGun-WindowsNoEditor", recursive: true);
             File.Copy(ARPath, UpGunPath + "\\AssetRegistry.bak");
-
+            CreateSig("UpGun-WindowsNoEditor_AssetRegistry");
             File.WriteAllText(GameVersionFile, CurrentGameVersion);
         }
 
@@ -365,90 +350,59 @@ internal class Fonctions
 
 
     public static void RepakTheNewBinFile()
-	{
+    {
         string quotedPath2 = $"\"{path2}\"";
         File.Delete(UpGunPath + "\\UpGun-WindowsNoEditor_AssetRegistry.pak");
-		ExecuteCmdCommand($"{quotedPath2} pack \"" + UpGunPath + "\\UpGun-WindowsNoEditor_AssetRegistry\"");
-	}
+        ExecuteCmdCommand($"{quotedPath2} pack \"" + UpGunPath + "\\UpGun-WindowsNoEditor_AssetRegistry\"");
+    }
 
-	public static void ResetBinFile()
-	{
+    public static void ResetBinFile()
+    {
         string quotedPath2 = $"\"{path2}\"";
         File.Delete(UpGunPath + "\\UpGun-WindowsNoEditor_AssetRegistry.pak");
-		File.Delete(UpGunPath + "\\UpGun-WindowsNoEditor_AssetRegistry\\UpGun\\AssetRegistry.bin");
-		File.Copy(UpGunPath + "\\AssetRegistry.bak", ARPath);
-		ExecuteCmdCommand($"{quotedPath2} pack \"" + UpGunPath + "\\UpGun-WindowsNoEditor_AssetRegistry\"");
-	}
+        File.Delete(UpGunPath + "\\UpGun-WindowsNoEditor_AssetRegistry\\UpGun\\AssetRegistry.bin");
+        File.Copy(UpGunPath + "\\AssetRegistry.bak", ARPath);
+        ExecuteCmdCommand($"{quotedPath2} pack \"" + UpGunPath + "\\UpGun-WindowsNoEditor_AssetRegistry\"");
+    }
 
     public static void ExecuteCmdCommand(string cmdCommand)
-	{
-		ProcessStartInfo startInfo = new ProcessStartInfo
-		{
-			FileName = "cmd.exe",
-			RedirectStandardInput = true,
-			UseShellExecute = false,
-			CreateNoWindow = true
-		};
-		Process process = new Process();
-		process.StartInfo = startInfo;
-		process.Start();
-		process.StandardInput.WriteLine("cd " + UpGunPath);
-		process.StandardInput.WriteLine(cmdCommand);
-		process.StandardInput.Flush();
-		process.StandardInput.Close();
-		process.WaitForExit();
-		process.Close();
-	}
+    {
+        ProcessStartInfo startInfo = new()
+        {
+            FileName = "cmd.exe",
+            RedirectStandardInput = true,
+            UseShellExecute = false,
+            CreateNoWindow = true
+        };
+        Process process = new()
+        {
+            StartInfo = startInfo
+        };
+        process.Start();
+        process.StandardInput.WriteLine("cd " + UpGunPath);
+        process.StandardInput.WriteLine(cmdCommand);
+        process.StandardInput.Flush();
+        process.StandardInput.Close();
+        process.WaitForExit();
+        process.Close();
+    }
 
-	public static async Task<string> GetUploadedMods()
-	{
-		string text = "http://144.24.205.218:8000/file/mods.txt";
-		HttpClient httpClient = new HttpClient();
-		try
-		{
-			HttpResponseMessage val = await httpClient.GetAsync(text);
-			if (val.IsSuccessStatusCode)
-			{
-				return (await val.Content.ReadAsStringAsync()).ToString();
-			}
-		}
-		finally
-		{
-			((IDisposable)httpClient)?.Dispose();
-		}
-		return null;
-	}
-
-	public static string[] GetDiscordUserIdAndAvatar()
-	{
-		string[] array = new string[3] { "discord", "discordcanary", "discordptb" };
-		for (int i = 0; i < array.Length; i++)
-		{
-			if (!Directory.Exists(Path.Combine(appdatapath, array[i])))
-			{
-				continue;
-			}
-			string[] files = Directory.GetFiles(Path.Combine(appdatapath, array[i], "Local Storage", "leveldb"), "*.ldb");
-			for (int j = 0; j < files.Length; j++)
-			{
-				StreamReader streamReader = new StreamReader(files[j]);
-				string pattern = "{\"_state\":{\"users\":\\[{\"id\":\"(.*?)\",\"avatar\":\"(.*?)\"";
-				Match match = Regex.Match(streamReader.ReadToEnd(), pattern);
-				if (match.Success)
-				{
-					return new string[2]
-					{
-						match.Groups[1].Value,
-						match.Groups[2].Value
-					};
-				}
-			}
-		}
-		JObject jObject = JObject.Parse(new WebClient().DownloadString("https://httpbin.org/ip"));
-		return new string[2]
-		{
-			jObject["origin"].ToString(),
-			""
-		};
-	}
+    public static async Task<string> GetUploadedMods()
+    {
+        string text = "http://144.24.205.218:8000/file/mods.txt";
+        HttpClient httpClient = new();
+        try
+        {
+            HttpResponseMessage val = await httpClient.GetAsync(text);
+            if (val.IsSuccessStatusCode)
+            {
+                return (await val.Content.ReadAsStringAsync()).ToString();
+            }
+        }
+        finally
+        {
+            ((IDisposable)httpClient)?.Dispose();
+        }
+        return null;
+    }
 }

@@ -59,23 +59,23 @@ public static class SplashManager
                 form.BeginInvoke(new Action(() =>
                 {
                     try { form.Close(); } catch { }
-                    try { form.Dispose(); } catch {  }
-                    try { Application.ExitThread(); } catch {  }
+                    try { form.Dispose(); } catch { }
+                    try { Application.ExitThread(); } catch { }
                 }));
             }
             else
             {
-                try { form.Dispose(); } catch {  }
+                try { form.Dispose(); } catch { }
             }
         }
         catch
         {
-            try { form.Dispose(); } catch {  }
+            try { form.Dispose(); } catch { }
         }
 
         if (threadToJoin != null && threadToJoin.IsAlive)
         {
-            try { threadToJoin.Join(2000); } catch {  }
+            try { threadToJoin.Join(2000); } catch { }
         }
     }
 

@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 public static class UpGunFinder
 {
@@ -23,7 +21,7 @@ public static class UpGunFinder
             string localPrograms = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) ?? "", "Programs", "Steam");
             possibleSteamRoots.Add(localPrograms);
         }
-        catch {}
+        catch { }
 
         foreach (var root in possibleSteamRoots.Distinct())
         {
@@ -36,7 +34,7 @@ public static class UpGunFinder
                     if (result != null) return result;
                 }
             }
-            catch {}
+            catch { }
         }
 
         foreach (var drive in DriveInfo.GetDrives().Where(d => d.IsReady))
@@ -52,7 +50,7 @@ public static class UpGunFinder
                     if (result != null) return result;
                 }
             }
-            catch {}
+            catch { }
         }
 
         return null;
@@ -100,7 +98,7 @@ public static class UpGunFinder
                         if (Directory.Exists(commonUpGun)) return commonUpGun;
                     }
                 }
-                catch {}
+                catch { }
             }
 
             var libVdf = Path.Combine(steamappsPath, "libraryfolders.vdf");
@@ -134,11 +132,11 @@ public static class UpGunFinder
                             }
                         }
                     }
-                    catch {}
+                    catch { }
                 }
             }
         }
-        catch {}
+        catch { }
 
         return null;
     }
@@ -197,7 +195,7 @@ public static class UpGunFinder
                 }
             }
         }
-        catch {}
+        catch { }
         return results.Distinct(StringComparer.OrdinalIgnoreCase);
     }
 
@@ -239,7 +237,7 @@ public static class UpGunFinder
                         queue.Enqueue((d, depth + 1));
                     }
                 }
-                catch {}
+                catch { }
             }
         }
 
