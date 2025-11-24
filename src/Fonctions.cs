@@ -15,7 +15,7 @@ using System.Windows.Forms;
 
 internal class Fonctions
 {
-    private readonly static string version = "1.0";
+    private readonly static string version = "1.1";
 
     private readonly static string CurrentGameVersion = UpGunFinder.GetInstalledVersion();
 
@@ -50,7 +50,7 @@ internal class Fonctions
         string url = "https://api.github.com/repos/XorcodeYt/UpGunLoader/releases";
 
         using HttpClient httpClient = new();
-        httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("UpGunModLoader/1.0");
+        httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("UpGunModLoader/1.1");
         httpClient.DefaultRequestHeaders.Accept.Add(
             new MediaTypeWithQualityHeaderValue("application/vnd.github+json"));
         httpClient.DefaultRequestHeaders.Authorization =
