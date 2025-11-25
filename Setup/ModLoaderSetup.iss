@@ -34,7 +34,11 @@ begin
     begin
       try
         repeat
-          if (FindRec.Name <> '.') and (FindRec.Name <> '..') and (CompareText(FindRec.Name, 'Mods') <> 0) then
+          if (FindRec.Name <> '.') and
+             (FindRec.Name <> '..') and
+             (CompareText(FindRec.Name, 'Mods') <> 0) and
+             (CompareText(FindRec.Name, 'gamepath.txt') <> 0) and
+             (CompareText(FindRec.Name, 'gameversion.txt') <> 0) then
           begin
             if (FindRec.Attributes and FILE_ATTRIBUTE_DIRECTORY) <> 0 then
               DelTree(ModLoaderPath + '\' + FindRec.Name, True, True, True)
@@ -50,7 +54,6 @@ begin
 
   Result := True;
 end;
-
 
 procedure CurStepChanged(CurStep: TSetupStep);
 begin
