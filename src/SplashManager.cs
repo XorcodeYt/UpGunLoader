@@ -8,19 +8,26 @@ public static class SplashManager
     private static SplashScreen _form;
     private static readonly object _lock = new();
 
-    public static void Show(string message = "Opération en cours")
+    public static void Show(string message = "")
     {
         lock (_lock)
         {
-            if (_form != null && _form.IsHandleCreated) { Update(message); return; }
+            if (_form?.IsHandleCreated == true)
+            {
+                Update(message);
+                return;
+            }
 
             _uiThread = new Thread(() =>
             {
                 _form = new SplashScreen();
                 _form.SetStatus(message);
                 Application.Run(_form);
-            });
-            _uiThread.IsBackground = true;
+            })
+            {
+                IsBackground = true
+            };
+
             _uiThread.SetApartmentState(ApartmentState.STA);
             _uiThread.Start();
         }
@@ -30,9 +37,10 @@ public static class SplashManager
     {
         lock (_lock)
         {
-            if (_form == null) return;
-            if (_form.IsHandleCreated)
+            if (_form?.IsHandleCreated == true)
+            {
                 _form.BeginInvoke(new Action(() => _form.SetStatus(message)));
+            }
         }
     }
 
@@ -47,7 +55,6 @@ public static class SplashManager
 
             form = _form;
             threadToJoin = _uiThread;
-
             _form = null;
             _uiThread = null;
         }
@@ -79,7 +86,7 @@ public static class SplashManager
         }
     }
 
-    public static IDisposable Scope(string initialMessage = "Opération en cours")
+    public static IDisposable Scope(string initialMessage = "")
     {
         Show(initialMessage);
         return new ScopeImpl();

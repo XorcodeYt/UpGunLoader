@@ -15,7 +15,7 @@ using System.Windows.Forms;
 
 internal class Fonctions
 {
-    private readonly static string version = "1.1";
+    private readonly static string version = "1.1.0.5";
 
     private readonly static string CurrentGameVersion = UpGunFinder.GetInstalledVersion();
 
@@ -50,7 +50,7 @@ internal class Fonctions
         string url = "https://api.github.com/repos/XorcodeYt/UpGunLoader/releases";
 
         using HttpClient httpClient = new();
-        httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("UpGunModLoader/1.1");
+        httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("UpGunModLoader/1.1.0.5");
         httpClient.DefaultRequestHeaders.Accept.Add(
             new MediaTypeWithQualityHeaderValue("application/vnd.github+json"));
         httpClient.DefaultRequestHeaders.Authorization =
@@ -135,16 +135,10 @@ internal class Fonctions
 
             if (Directory.Exists(appdatapath3 + "\\" + ModName))
             {
-                SplashManager.Update("Cleaning local mod folder");
+                SplashManager.Update("Cleaning");
                 Directory.Delete(appdatapath3 + "\\" + ModName, recursive: true);
-
-                SplashManager.Update("Resetting AssetRegistry");
                 ResetBinFile();
-
-                SplashManager.Update("Reinstalling all mods");
                 ReinstallAllMods();
-
-                SplashManager.Update("Repacking AssetRegistry");
                 RepakTheNewBinFile();
             }
         }
@@ -190,8 +184,6 @@ internal class Fonctions
             {
                 SplashManager.Update("Injecting JSON code");
                 InjectJsonCode(text);
-
-                SplashManager.Update("Repacking AssetRegistry");
                 RepakTheNewBinFile();
             }
         }
@@ -290,13 +282,10 @@ internal class Fonctions
                 "Mod support will update all mods will be wipped",
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Information);
-            CleanUpGunFolder();
-            InstallModsSupport();
             return true;
         }
         return false;
     }
-
 
     static void CopyDirectory(string sourceDir, string destDir, bool recursive)
     {

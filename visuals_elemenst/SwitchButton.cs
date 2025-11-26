@@ -100,15 +100,15 @@ public class SwitchButton : CheckBox
 
     public SwitchButton()
     {
-        MinimumSize = new Size(45, 22);
+        MinimumSize = new Size(45, 45);
     }
 
     private GraphicsPath GetFigurePath()
     {
         int num = Height - 1;
-        Rectangle rect = new Rectangle(0, 0, num, num);
-        Rectangle rect2 = new Rectangle(Width - num - 2, 0, num, num);
-        GraphicsPath graphicsPath = new GraphicsPath();
+        Rectangle rect = new(0, 0, num, num);
+        Rectangle rect2 = new(Width - num - 2, 0, num, num);
+        GraphicsPath graphicsPath = new();
         graphicsPath.StartFigure();
         graphicsPath.AddArc(rect, 90f, 180f);
         graphicsPath.AddArc(rect2, 270f, 180f);
@@ -118,32 +118,32 @@ public class SwitchButton : CheckBox
 
     protected override void OnPaint(PaintEventArgs pevent)
     {
-        int num = Height - 5;
         pevent.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
         pevent.Graphics.Clear(Parent.BackColor);
-        if (Checked)
+
+        int toggleSize = Height - 5;
+        bool isChecked = Checked;
+
+        Color backColor = isChecked ? onBackColor : offBackColor;
+        Color toggleColor = isChecked ? onToggleColor : offToggleColor;
+
+        int toggleX = isChecked ? Width - Height + 1 : 2;
+        Rectangle toggleRect = new(toggleX, 2, toggleSize, toggleSize);
+
+        using GraphicsPath path = GetFigurePath();
+        if (solidStyle)
         {
-            if (solidStyle)
-            {
-                pevent.Graphics.FillPath(new SolidBrush(onBackColor), GetFigurePath());
-            }
-            else
-            {
-                pevent.Graphics.DrawPath(new Pen(onBackColor, 2f), GetFigurePath());
-            }
-            pevent.Graphics.FillEllipse(new SolidBrush(onToggleColor), new Rectangle(Width - Height + 1, 2, num, num));
+            using SolidBrush backBrush = new(backColor);
+            pevent.Graphics.FillPath(backBrush, path);
         }
         else
         {
-            if (solidStyle)
-            {
-                pevent.Graphics.FillPath(new SolidBrush(offBackColor), GetFigurePath());
-            }
-            else
-            {
-                pevent.Graphics.DrawPath(new Pen(offBackColor, 2f), GetFigurePath());
-            }
-            pevent.Graphics.FillEllipse(new SolidBrush(offToggleColor), new Rectangle(2, 2, num, num));
+            using Pen borderPen = new(backColor, 2f);
+            pevent.Graphics.DrawPath(borderPen, path);
         }
+
+        using SolidBrush toggleBrush = new(toggleColor);
+        pevent.Graphics.FillEllipse(toggleBrush, toggleRect);
     }
 }
+

@@ -23,8 +23,6 @@ public class UpGun_Mod_Loader : Form
 
     private const int itemsPerPage = 6;
     private Panel pnlTitle;
-    private Panel pnlTitleText;
-    private Label lblTitle;
     private Panel pnlClose;
     private Button BtnReduce;
     private Button BtnClose;
@@ -33,15 +31,16 @@ public class UpGun_Mod_Loader : Form
     private Label lblPage;
     private Button btnPrevious;
     private Panel pnlPages;
-    private Panel pnlSearch;
-    private DarkComboBox cbSearchTypes;
-    private TextBox tbSearchBar;
+    private Panel PnlSearch;
     private FlowLayoutPanel flpnlMods;
     private Button Btn_Discord;
     private Button Btn_Refresh;
     private Button Btn_UpGun;
     private TextBox textBox1;
-    private Label label1;
+    private ComboBox CbSearchTypes;
+    private TextBox tbSearchBar;
+    private Panel pnlTitleText;
+    private Label lblTitle;
     private bool CanSearch = true;
 
     public UpGun_Mod_Loader()
@@ -58,7 +57,7 @@ public class UpGun_Mod_Loader : Form
             pbLogo.MouseDown += TitleDrag_MouseDown;
             btnNext.Click += PbNextPage_Click;
             btnPrevious.Click += PbPreviousPage_Click;
-            cbSearchTypes.SelectedIndexChanged += Search;
+            CbSearchTypes.SelectedIndexChanged += Search;
             tbSearchBar.KeyDown += (s, e) =>
             {
                 if (e.KeyCode == Keys.Enter)
@@ -70,7 +69,7 @@ public class UpGun_Mod_Loader : Form
 
             int radius = 18;
 
-            MakeRounded(pnlSearch, radius);
+            MakeRounded(PnlSearch, radius);
             MakeRounded(btnNext, radius);
             MakeRounded(btnPrevious, radius);
             MakeRounded(pnlPages, radius);
@@ -87,7 +86,7 @@ public class UpGun_Mod_Loader : Form
             MakeRounded(tbSearchBar, 6);
             tbSearchBar.Resize += (s, e) => MakeRounded(tbSearchBar, 6);
 
-            pnlSearch.Paint += PnlSearch_Paint;
+            PnlSearch.Paint += PnlSearch_Paint;
 
             CheckForIllegalCrossThreadCalls = false;
 
@@ -118,12 +117,14 @@ public class UpGun_Mod_Loader : Form
     }
     private void InitSearchBarPlaceholder()
     {
+        const string placeholder = "Search by name";
+
+        tbSearchBar.Text = placeholder;
         tbSearchBar.ForeColor = Color.Gray;
-        tbSearchBar.Text = "Search by name";
 
         tbSearchBar.GotFocus += (s, e) =>
         {
-            if (tbSearchBar.Text == "Search by name")
+            if (tbSearchBar.Text == placeholder)
             {
                 tbSearchBar.Text = "";
                 tbSearchBar.ForeColor = Color.White;
@@ -134,7 +135,7 @@ public class UpGun_Mod_Loader : Form
         {
             if (string.IsNullOrWhiteSpace(tbSearchBar.Text))
             {
-                tbSearchBar.Text = "Search by name";
+                tbSearchBar.Text = placeholder;
                 tbSearchBar.ForeColor = Color.Gray;
             }
         };
@@ -200,7 +201,7 @@ public class UpGun_Mod_Loader : Form
 
     private async void GetModsFileIds()
     {
-        GetAllMods(await Fonctions.GetUploadedMods(), tbSearchBar.Text, cbSearchTypes.SelectedItem?.ToString());
+        GetAllMods(await Fonctions.GetUploadedMods(), tbSearchBar.Text, CbSearchTypes.SelectedItem?.ToString());
     }
 
     private void GetAllMods(string allMods, string searchName, string searchType)
@@ -293,9 +294,9 @@ public class UpGun_Mod_Loader : Form
         {
             Name = $"lblName_{ModName}",
             AutoSize = true,
-            Font = new Font("Myanmar Text", 12f, FontStyle.Bold),
+            Font = new Font("Franklin Gothic", 11f, FontStyle.Bold),
             ForeColor = Color.White,
-            Location = new Point(195, 10),
+            Location = new Point(175, 5),
             Text = ModName
         };
 
@@ -305,7 +306,7 @@ public class UpGun_Mod_Loader : Form
             AutoSize = true,
             Font = new Font("Myanmar Text", 9f, FontStyle.Bold),
             ForeColor = Color.White,
-            Location = new Point(195, 35),
+            Location = new Point(175, 30),
             Text = OwnerName
         };
 
@@ -315,7 +316,7 @@ public class UpGun_Mod_Loader : Form
             AutoSize = true,
             Font = new Font("Myanmar Text", 9f, FontStyle.Bold),
             ForeColor = Color.White,
-            Location = new Point(195, 75),
+            Location = new Point(175, 50),
             Text = ModType
         };
 
@@ -325,7 +326,7 @@ public class UpGun_Mod_Loader : Form
             AutoSize = true,
             Font = new Font("Myanmar Text", 9f, FontStyle.Bold),
             ForeColor = Color.White,
-            Location = new Point(195, 55),
+            Location = new Point(175, 70),
             Text = ModSize
         };
 
@@ -333,17 +334,17 @@ public class UpGun_Mod_Loader : Form
         {
             Name = $"switchButton_{ModName}",
             AutoSize = true,
-            Location = new Point(270, 50),
-            MinimumSize = new Size(45, 22),
-            Size = new Size(45, 22),
+            Location = new Point(270, 55),
+            MinimumSize = new Size(50,20),
+            Size = new Size(45, 45),
             OffBackColor = Color.Gray,
             OffToggleColor = Color.Gainsboro,
-            OnBackColor = Color.FromArgb(0, 192, 0),
-            OnToggleColor = Color.WhiteSmoke,
+            OnBackColor = Color.Gold,
+            OnToggleColor = Color.White,
             Checked = isInstalled
         };
 
-        SBDLSwitch.CheckedChanged += (s, e) =>
+        SBDLSwitch.CheckedChanged += async (s, e) =>
         {
             if (!Fonctions.CheckIfModSupportInstalled())
                 return;
@@ -351,10 +352,8 @@ public class UpGun_Mod_Loader : Form
             if (Process.GetProcessesByName("UpGun-Win64-Shipping").Length != 0)
             {
                 Fonctions.ExecuteCmdCommand("taskkill /f /im UpGun-Win64-Shipping.exe");
-                MessageBox.Show("UpGun.exe closed!");
+                MessageBox.Show("UpGun closed!");
             }
-
-            Thread.Sleep(300);
 
             if (SBDLSwitch.Checked)
                 Fonctions.InstallMod(ModDLUrl, newZipFileName);
@@ -374,9 +373,9 @@ public class UpGun_Mod_Loader : Form
         panel.Controls.Add(picture);
 
         flpnlMods.Controls.Add(panel);
-        MakeRounded(panel, 18);
-        MakeRounded(icnNew, 10);
-        MakeRounded(picture, 18);
+        MakeRounded(panel, 15);
+        MakeRounded(icnNew, 5);
+        MakeRounded(picture, 15);
     }
 
     private void ChangePage(int delta)
@@ -434,7 +433,7 @@ public class UpGun_Mod_Loader : Form
         currentPage = 0;
         ResetPageNum();
 
-        GetAllMods(await Fonctions.GetUploadedMods(), tbSearchBar.Text, cbSearchTypes.SelectedItem?.ToString());
+        GetAllMods(await Fonctions.GetUploadedMods(), tbSearchBar.Text, CbSearchTypes.SelectedItem?.ToString());
 
         CanSearch = true;
     }
@@ -446,25 +445,25 @@ public class UpGun_Mod_Loader : Form
             this.BtnReduce = new System.Windows.Forms.Button();
             this.pnlClose = new System.Windows.Forms.Panel();
             this.BtnClose = new System.Windows.Forms.Button();
-            this.pnlTitleText = new System.Windows.Forms.Panel();
-            this.lblTitle = new System.Windows.Forms.Label();
             this.btnNext = new System.Windows.Forms.Button();
             this.lblPage = new System.Windows.Forms.Label();
             this.btnPrevious = new System.Windows.Forms.Button();
             this.pnlPages = new System.Windows.Forms.Panel();
-            this.pnlSearch = new System.Windows.Forms.Panel();
+            this.PnlSearch = new System.Windows.Forms.Panel();
             this.tbSearchBar = new System.Windows.Forms.TextBox();
             this.Btn_Refresh = new System.Windows.Forms.Button();
+            this.CbSearchTypes = new System.Windows.Forms.ComboBox();
             this.flpnlMods = new System.Windows.Forms.FlowLayoutPanel();
             this.textBox1 = new System.Windows.Forms.TextBox();
-            this.label1 = new System.Windows.Forms.Label();
             this.Btn_UpGun = new System.Windows.Forms.Button();
             this.Btn_Discord = new System.Windows.Forms.Button();
+            this.lblTitle = new System.Windows.Forms.Label();
+            this.pnlTitleText = new System.Windows.Forms.Panel();
             this.pnlTitle.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pbLogo)).BeginInit();
             this.pnlClose.SuspendLayout();
+            this.PnlSearch.SuspendLayout();
             this.pnlTitleText.SuspendLayout();
-            this.pnlSearch.SuspendLayout();
             this.SuspendLayout();
             // 
             // pnlTitle
@@ -486,7 +485,7 @@ public class UpGun_Mod_Loader : Form
             // 
             this.pbLogo.Image = global::UpGunModLoader.Properties.Resources.logo93;
             this.pbLogo.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.pbLogo.Location = new System.Drawing.Point(20, 3);
+            this.pbLogo.Location = new System.Drawing.Point(20, 0);
             this.pbLogo.Name = "pbLogo";
             this.pbLogo.Size = new System.Drawing.Size(35, 35);
             this.pbLogo.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
@@ -533,36 +532,12 @@ public class UpGun_Mod_Loader : Form
             this.BtnClose.Text = "X";
             this.BtnClose.UseVisualStyleBackColor = false;
             // 
-            // pnlTitleText
-            // 
-            this.pnlTitleText.Controls.Add(this.lblTitle);
-            this.pnlTitleText.Location = new System.Drawing.Point(40, 0);
-            this.pnlTitleText.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.pnlTitleText.Name = "pnlTitleText";
-            this.pnlTitleText.Size = new System.Drawing.Size(200, 35);
-            this.pnlTitleText.TabIndex = 1;
-            // 
-            // lblTitle
-            // 
-            this.lblTitle.AutoSize = true;
-            this.lblTitle.BackColor = System.Drawing.Color.Transparent;
-            this.lblTitle.Font = new System.Drawing.Font("Unispace", 12F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblTitle.ForeColor = System.Drawing.Color.White;
-            this.lblTitle.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.lblTitle.Location = new System.Drawing.Point(21, 8);
-            this.lblTitle.Name = "lblTitle";
-            this.lblTitle.Size = new System.Drawing.Size(169, 19);
-            this.lblTitle.TabIndex = 0;
-            this.lblTitle.Text = "UpGun Mod Loader";
-            this.lblTitle.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
-            this.lblTitle.UseMnemonic = false;
-            // 
             // btnNext
             // 
             this.btnNext.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(20)))), ((int)(((byte)(22)))), ((int)(((byte)(30)))));
             this.btnNext.FlatAppearance.BorderSize = 0;
             this.btnNext.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnNext.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold);
+            this.btnNext.Font = new System.Drawing.Font("Unispace", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnNext.ForeColor = System.Drawing.Color.White;
             this.btnNext.ImeMode = System.Windows.Forms.ImeMode.NoControl;
             this.btnNext.Location = new System.Drawing.Point(377, 419);
@@ -576,12 +551,12 @@ public class UpGun_Mod_Loader : Form
             // 
             this.lblPage.AutoSize = true;
             this.lblPage.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(20)))), ((int)(((byte)(22)))), ((int)(((byte)(30)))));
-            this.lblPage.Font = new System.Drawing.Font("Myanmar Text", 12F, System.Drawing.FontStyle.Bold);
+            this.lblPage.Font = new System.Drawing.Font("Unispace", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblPage.ForeColor = System.Drawing.Color.White;
             this.lblPage.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.lblPage.Location = new System.Drawing.Point(349, 428);
+            this.lblPage.Location = new System.Drawing.Point(349, 430);
             this.lblPage.Name = "lblPage";
-            this.lblPage.Size = new System.Drawing.Size(22, 29);
+            this.lblPage.Size = new System.Drawing.Size(19, 19);
             this.lblPage.TabIndex = 2;
             this.lblPage.Text = "1";
             this.lblPage.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
@@ -591,7 +566,7 @@ public class UpGun_Mod_Loader : Form
             this.btnPrevious.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(20)))), ((int)(((byte)(22)))), ((int)(((byte)(30)))));
             this.btnPrevious.FlatAppearance.BorderSize = 0;
             this.btnPrevious.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnPrevious.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold);
+            this.btnPrevious.Font = new System.Drawing.Font("Unispace", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnPrevious.ForeColor = System.Drawing.Color.White;
             this.btnPrevious.ImeMode = System.Windows.Forms.ImeMode.NoControl;
             this.btnPrevious.Location = new System.Drawing.Point(303, 419);
@@ -609,26 +584,25 @@ public class UpGun_Mod_Loader : Form
             this.pnlPages.Size = new System.Drawing.Size(114, 40);
             this.pnlPages.TabIndex = 4;
             // 
-            // pnlSearch
+            // PnlSearch
             // 
-            this.pnlSearch.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(20)))), ((int)(((byte)(22)))), ((int)(((byte)(30)))));
-            this.pnlSearch.Controls.Add(this.tbSearchBar);
-            this.pnlSearch.Controls.Add(this.Btn_Refresh);
-            this.pnlSearch.Location = new System.Drawing.Point(10, 50);
-            this.pnlSearch.Name = "pnlSearch";
-            this.pnlSearch.Size = new System.Drawing.Size(378, 40);
-            this.pnlSearch.TabIndex = 5;
+            this.PnlSearch.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(20)))), ((int)(((byte)(22)))), ((int)(((byte)(30)))));
+            this.PnlSearch.Controls.Add(this.tbSearchBar);
+            this.PnlSearch.Controls.Add(this.Btn_Refresh);
+            this.PnlSearch.Controls.Add(this.CbSearchTypes);
+            this.PnlSearch.Location = new System.Drawing.Point(10, 50);
+            this.PnlSearch.Name = "PnlSearch";
+            this.PnlSearch.Size = new System.Drawing.Size(700, 40);
+            this.PnlSearch.TabIndex = 5;
+            this.PnlSearch.Paint += new System.Windows.Forms.PaintEventHandler(this.PnlSearch_Paint_1);
             // 
             // tbSearchBar
             // 
-            this.tbSearchBar.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(20)))), ((int)(((byte)(22)))), ((int)(((byte)(30)))));
-            this.tbSearchBar.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.tbSearchBar.Font = new System.Drawing.Font("Myanmar Text", 8.25F, System.Drawing.FontStyle.Bold);
-            this.tbSearchBar.ForeColor = System.Drawing.Color.White;
-            this.tbSearchBar.Location = new System.Drawing.Point(216, 10);
+            this.tbSearchBar.Font = new System.Drawing.Font("Unispace", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.tbSearchBar.Location = new System.Drawing.Point(197, 11);
             this.tbSearchBar.Name = "tbSearchBar";
-            this.tbSearchBar.Size = new System.Drawing.Size(151, 21);
-            this.tbSearchBar.TabIndex = 1;
+            this.tbSearchBar.Size = new System.Drawing.Size(164, 21);
+            this.tbSearchBar.TabIndex = 9;
             this.tbSearchBar.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // Btn_Refresh
@@ -650,6 +624,36 @@ public class UpGun_Mod_Loader : Form
             this.Btn_Refresh.UseVisualStyleBackColor = false;
             this.Btn_Refresh.Click += new System.EventHandler(this.Btn_Refresh_Click);
             // 
+            // CbSearchTypes
+            // 
+            this.CbSearchTypes.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(20)))), ((int)(((byte)(22)))), ((int)(((byte)(30)))));
+            this.CbSearchTypes.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.CbSearchTypes.DropDownHeight = 125;
+            this.CbSearchTypes.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.CbSearchTypes.DropDownWidth = 125;
+            this.CbSearchTypes.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.CbSearchTypes.Font = new System.Drawing.Font("Unispace", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.CbSearchTypes.ForeColor = System.Drawing.Color.White;
+            this.CbSearchTypes.IntegralHeight = false;
+            //this.CbSearchTypes.Items.AddRange(new object[] { //Mettre en com si Dev
+            this.CbSearchTypes.Items.AddRange(new object[] {
+            "All",
+            "Cosmetic",
+            "Event",
+            "Gameplay",
+            "HUD",
+            "Lobby Settings",
+            "Map",
+            "Player Model",
+            "Settings",
+            "Skin"});
+            //"Skin"}); //Mettre en com si Dev
+            this.CbSearchTypes.Location = new System.Drawing.Point(55, 10);
+            this.CbSearchTypes.Name = "CbSearchTypes";
+            this.CbSearchTypes.Size = new System.Drawing.Size(121, 22);
+            this.CbSearchTypes.TabIndex = 0;
+            this.CbSearchTypes.SelectedIndexChanged += new System.EventHandler(this.CbSearchTypes_SelectedIndexChanged);
+            // 
             // flpnlMods
             // 
             this.flpnlMods.Location = new System.Drawing.Point(10, 97);
@@ -664,30 +668,15 @@ public class UpGun_Mod_Loader : Form
             this.textBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.textBox1.Cursor = System.Windows.Forms.Cursors.Arrow;
             this.textBox1.Enabled = false;
-            this.textBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
+            this.textBox1.Font = new System.Drawing.Font("Unispace", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.textBox1.ForeColor = System.Drawing.Color.Transparent;
             this.textBox1.Location = new System.Drawing.Point(10, 441);
             this.textBox1.Name = "textBox1";
             this.textBox1.ReadOnly = true;
             this.textBox1.ShortcutsEnabled = false;
-            this.textBox1.Size = new System.Drawing.Size(100, 13);
+            this.textBox1.Size = new System.Drawing.Size(100, 14);
             this.textBox1.TabIndex = 9;
-            this.textBox1.Text = "v1.1";
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.BackColor = System.Drawing.Color.Transparent;
-            this.label1.Font = new System.Drawing.Font("Unispace", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.ForeColor = System.Drawing.Color.White;
-            this.label1.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.label1.Location = new System.Drawing.Point(394, 60);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(149, 19);
-            this.label1.TabIndex = 1;
-            this.label1.Text = "V2 coming soon";
-            this.label1.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
-            this.label1.UseMnemonic = false;
+            this.textBox1.Text = "v1.1.0.5";
             // 
             // Btn_UpGun
             // 
@@ -726,13 +715,36 @@ public class UpGun_Mod_Loader : Form
             this.Btn_Discord.UseVisualStyleBackColor = false;
             this.Btn_Discord.Click += new System.EventHandler(this.Btn_Discord_Click);
             // 
+            // lblTitle
+            // 
+            this.lblTitle.AutoSize = true;
+            this.lblTitle.BackColor = System.Drawing.Color.Transparent;
+            this.lblTitle.Font = new System.Drawing.Font("Unispace", 12F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblTitle.ForeColor = System.Drawing.Color.White;
+            this.lblTitle.ImeMode = System.Windows.Forms.ImeMode.NoControl;
+            this.lblTitle.Location = new System.Drawing.Point(21, 8);
+            this.lblTitle.Name = "lblTitle";
+            this.lblTitle.Size = new System.Drawing.Size(169, 19);
+            this.lblTitle.TabIndex = 0;
+            this.lblTitle.Text = "UpGun Mod Loader";
+            this.lblTitle.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
+            this.lblTitle.UseMnemonic = false;
+            // 
+            // pnlTitleText
+            // 
+            this.pnlTitleText.Controls.Add(this.lblTitle);
+            this.pnlTitleText.Location = new System.Drawing.Point(40, 0);
+            this.pnlTitleText.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.pnlTitleText.Name = "pnlTitleText";
+            this.pnlTitleText.Size = new System.Drawing.Size(200, 35);
+            this.pnlTitleText.TabIndex = 1;
+            // 
             // UpGun_Mod_Loader
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(14)))), ((int)(((byte)(17)))), ((int)(((byte)(27)))));
             this.ClientSize = new System.Drawing.Size(720, 470);
-            this.Controls.Add(this.label1);
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.Btn_UpGun);
             this.Controls.Add(this.Btn_Discord);
@@ -742,7 +754,7 @@ public class UpGun_Mod_Loader : Form
             this.Controls.Add(this.btnNext);
             this.Controls.Add(this.pnlPages);
             this.Controls.Add(this.pnlTitle);
-            this.Controls.Add(this.pnlSearch);
+            this.Controls.Add(this.PnlSearch);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.MaximumSize = new System.Drawing.Size(720, 470);
@@ -754,10 +766,10 @@ public class UpGun_Mod_Loader : Form
             this.pnlTitle.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pbLogo)).EndInit();
             this.pnlClose.ResumeLayout(false);
+            this.PnlSearch.ResumeLayout(false);
+            this.PnlSearch.PerformLayout();
             this.pnlTitleText.ResumeLayout(false);
             this.pnlTitleText.PerformLayout();
-            this.pnlSearch.ResumeLayout(false);
-            this.pnlSearch.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -776,5 +788,15 @@ public class UpGun_Mod_Loader : Form
     private void Btn_UpGun_Click(object sender, EventArgs e)
     {
         Process.Start("steam://rungameid/1575870");
+    }
+
+    private void PnlSearch_Paint_1(object sender, PaintEventArgs e)
+    {
+
+    }
+
+    private void CbSearchTypes_SelectedIndexChanged(object sender, EventArgs e)
+    {
+
     }
 }
