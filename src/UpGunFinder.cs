@@ -211,7 +211,7 @@ public static class UpGunFinder
             var (path, depth) = queue.Dequeue();
             if (depth > maxDepth) continue;
 
-            IEnumerable<string> subdirs = null;
+            IEnumerable<string> subdirs;
             try
             {
                 subdirs = Directory.EnumerateDirectories(path);

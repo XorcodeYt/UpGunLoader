@@ -15,7 +15,7 @@ using System.Windows.Forms;
 
 internal class Fonctions
 {
-    private readonly static string version = "1.1.0.5";
+    private readonly static string version = "1.1.0.6";
 
     private readonly static string CurrentGameVersion = UpGunFinder.GetInstalledVersion();
 
@@ -93,6 +93,11 @@ internal class Fonctions
                 "Update Required",
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Information);
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = "https://github.com/XorcodeYt/UpGunLoader/releases/tag/RELEASES",
+                UseShellExecute = true
+            });
         }
     }
 

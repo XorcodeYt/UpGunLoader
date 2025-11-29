@@ -7,6 +7,4 @@ using System.Runtime.CompilerServices;
 internal sealed class Settings : ApplicationSettingsBase
 {
     private static Settings defaultInstance = (Settings)Synchronized(new Settings());
-
-    public static Settings Default => defaultInstance;
 }
