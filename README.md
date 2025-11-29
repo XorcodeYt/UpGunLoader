@@ -6,6 +6,8 @@
 
 ---
 
+<img width="720" height="470" alt="Capture d’écran 2025-11-29 203301" src="https://github.com/user-attachments/assets/3e071a59-6f02-41e9-8fcb-7ab405ed5852" />
+
 ## ✨ Features & Improvements
 
 - 🎨 Fully redesigned UI: minimal, clean, and user-friendly.
