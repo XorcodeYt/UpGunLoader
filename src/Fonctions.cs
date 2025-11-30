@@ -50,7 +50,7 @@ internal class Fonctions
         string url = "https://api.github.com/repos/XorcodeYt/UpGunLoader/releases";
 
         using HttpClient httpClient = new();
-        httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("UpGunModLoader/1.1.0.5");
+        httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("UpGunModLoader/1.1.0.6");
         httpClient.DefaultRequestHeaders.Accept.Add(
             new MediaTypeWithQualityHeaderValue("application/vnd.github+json"));
         httpClient.DefaultRequestHeaders.Authorization =

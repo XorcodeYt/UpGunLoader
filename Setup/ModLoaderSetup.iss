@@ -1,6 +1,6 @@
 [Setup]
 AppName=UpGunModLoader
-AppVersion=1.1.0.5
+AppVersion=1.1.0.6
 DefaultDirName={userappdata}\UpGunMods
 DefaultGroupName=UpGunMods
 OutputBaseFilename=Setup_UpGunModLoader
